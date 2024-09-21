@@ -1,6 +1,7 @@
 use crate::{engine::Engine, outcomes::Outcomes, Context, PlayerContext};
 use boa_engine::{object::builtins::JsFunction, JsError, JsValue};
 use implicit_clone::ImplicitClone;
+use std::{error::Error, fmt};
 
 #[derive(Debug, Clone, ImplicitClone)]
 pub struct Binding {
@@ -25,7 +26,7 @@ impl Binding {
 
         let choice = outcomes
             .choice_from_value::<<C::Player as PlayerContext>::Choice>(value)
-            .map_err(CallError::ExpectedCooperateOrDefect)?;
+            .map_err(CallError::ExpectedChoice)?;
 
         Ok(choice)
     }
@@ -35,6 +36,17 @@ pub type CallResult<C> = Result<<<C as Context>::Player as PlayerContext>::Choic
 
 #[derive(Debug, Clone)]
 pub enum CallError {
-    ExpectedCooperateOrDefect(JsValue),
+    ExpectedChoice(JsValue),
     ThrownError(JsError),
 }
+
+impl fmt::Display for CallError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ExpectedChoice(value) => write!(f, "Expected choice, got {value:?}"),
+            Self::ThrownError(error) => write!(f, "Failed to call binding: {error}"),
+        }
+    }
+}
+
+impl Error for CallError {}

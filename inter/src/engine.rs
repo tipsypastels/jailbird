@@ -65,7 +65,7 @@ impl Engine {
 
         fn _player_context(
             boa: &mut Boa,
-            player: impl PlayerContext,
+            player: &impl PlayerContext,
             outcomes: Outcomes,
         ) -> JsObject {
             let elements = player

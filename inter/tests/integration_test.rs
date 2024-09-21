@@ -9,6 +9,22 @@ fn always_cooperate() {
     assert_eq!(choice, Choice::Cooperate);
 }
 
+#[test]
+fn tit_for_tat() {
+    let mut inter = Interpreter::<ChoicesContext>::new();
+    let tit_for_tat = inter.bind("return context.otherPlayer.choices.at(-1) ?? COOPERATE;");
+
+    let first_ctx = ChoicesContext::new(&[], &[]);
+    let first_choice = inter.call(&tit_for_tat, first_ctx).unwrap();
+
+    assert_eq!(first_choice, Choice::Cooperate);
+
+    let later_ctx = ChoicesContext::new(&[], &[Choice::Defect]);
+    let later_choice = inter.call(&tit_for_tat, later_ctx).unwrap();
+
+    assert_eq!(later_choice, Choice::Defect);
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 enum Choice {
     Cooperate,
@@ -40,12 +56,12 @@ impl Context for DummyCtx {
         *self
     }
 
-    fn this_player(&self) -> Self::Player {
-        *self
+    fn this_player(&self) -> &Self::Player {
+        self
     }
 
-    fn other_player(&self) -> Self::Player {
-        *self
+    fn other_player(&self) -> &Self::Player {
+        self
     }
 }
 
@@ -64,5 +80,40 @@ impl PlayerContext for DummyCtx {
 
     fn choices(&self) -> &[Self::Choice] {
         &[]
+    }
+}
+
+struct ChoicesContext(ChoicesPlayerContext, ChoicesPlayerContext);
+
+impl ChoicesContext {
+    fn new(this: &'static [Choice], other: &'static [Choice]) -> Self {
+        Self(ChoicesPlayerContext(this), ChoicesPlayerContext(other))
+    }
+}
+
+impl Context for ChoicesContext {
+    type Turn = DummyCtx;
+    type Player = ChoicesPlayerContext;
+
+    fn turn(&self) -> Self::Turn {
+        DummyCtx
+    }
+
+    fn this_player(&self) -> &Self::Player {
+        &self.0
+    }
+
+    fn other_player(&self) -> &Self::Player {
+        &self.1
+    }
+}
+
+struct ChoicesPlayerContext(&'static [Choice]);
+
+impl PlayerContext for ChoicesPlayerContext {
+    type Choice = Choice;
+
+    fn choices(&self) -> &[Self::Choice] {
+        self.0
     }
 }

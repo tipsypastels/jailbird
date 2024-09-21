@@ -3,8 +3,8 @@ pub trait Context {
     type Player: PlayerContext;
 
     fn turn(&self) -> Self::Turn;
-    fn this_player(&self) -> Self::Player;
-    fn other_player(&self) -> Self::Player;
+    fn this_player(&self) -> &Self::Player;
+    fn other_player(&self) -> &Self::Player;
 }
 
 pub trait TurnContext {

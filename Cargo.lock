@@ -1016,6 +1016,7 @@ name = "jailbird-core"
 version = "0.1.0"
 dependencies = [
  "implicit-clone 0.5.0",
+ "jailbird-inter",
 ]
 
 [[package]]

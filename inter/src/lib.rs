@@ -1,5 +1,7 @@
+#![warn(missing_debug_implementations)]
+
 use self::{engine::Engine, outcomes::Outcomes};
-use std::marker::PhantomData;
+use std::{fmt, marker::PhantomData};
 
 mod binding;
 mod context;
@@ -43,5 +45,11 @@ impl<C> Interpreter<C> {
 impl<C> Default for Interpreter<C> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<C> fmt::Debug for Interpreter<C> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Interpreter").finish_non_exhaustive()
     }
 }

@@ -3,5 +3,9 @@ name = "jailbird-core"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+inter = ["dep:jailbird-inter"]
+
 [dependencies]
+jailbird-inter = { path = "../inter", optional = true }
 implicit-clone.workspace = true

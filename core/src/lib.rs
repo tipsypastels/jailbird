@@ -6,7 +6,7 @@ mod strategy;
 #[derive(Debug)]
 pub struct Runtime {
     #[cfg(feature = "inter")]
-    inter: jailbird_inter::Interpreter<Self>,
+    inter: jailbird_inter::Interpreter,
 }
 
 impl Runtime {

@@ -32,6 +32,13 @@ impl Binding {
     }
 }
 
+// JsObject impls this but JsFunction which derefs to it does not for some reason.
+impl PartialEq for Binding {
+    fn eq(&self, other: &Self) -> bool {
+        *self.function == *other.function
+    }
+}
+
 pub type CallResult<C> = Result<<<C as Context>::Player as PlayerContext>::Choice, CallError>;
 
 #[derive(Debug, Clone)]

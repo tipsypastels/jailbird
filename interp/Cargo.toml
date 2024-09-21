@@ -1,0 +1,8 @@
+[package]
+name = "jailbird-interp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+boa_engine = "0.19.1"
+implicit-clone.workspace = true

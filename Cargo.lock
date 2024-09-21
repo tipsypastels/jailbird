@@ -1019,7 +1019,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "jailbird-interp"
+name = "jailbird-inter"
 version = "0.1.0"
 dependencies = [
  "boa_engine",

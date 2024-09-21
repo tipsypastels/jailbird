@@ -18,6 +18,9 @@ pub trait PlayerContext {
     fn choices(&self) -> &[Self::Choice];
 }
 
-pub trait ChoiceContext: Copy + PartialEq {
+pub trait ChoiceContext: Copy {
+    fn cooperate() -> Self;
+    fn defect() -> Self;
+
     fn is_cooperate(self) -> bool;
 }

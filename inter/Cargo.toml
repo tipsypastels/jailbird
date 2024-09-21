@@ -1,5 +1,5 @@
 [package]
-name = "jailbird-interp"
+name = "jailbird-inter"
 version = "0.1.0"
 edition = "2021"
 

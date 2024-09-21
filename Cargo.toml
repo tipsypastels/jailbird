@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "core", "inter"]
+members = ["app", "choice", "core", "inter"]
 
 [workspace.dependencies]
 implicit-clone = "0.5.0"

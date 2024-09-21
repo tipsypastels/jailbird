@@ -1,48 +1,29 @@
+use jailbird_choice::*;
 use jailbird_inter::*;
 
 #[test]
 fn always_cooperate() {
-    let mut inter = Interpreter::<DummyCtx>::new();
+    let mut inter = Interpreter::new();
     let always_cooperate = inter.bind("return COOPERATE;");
     let choice = inter.call(&always_cooperate, DummyCtx).unwrap();
 
-    assert_eq!(choice, Choice::Cooperate);
+    assert_eq!(choice, Cooperate);
 }
 
 #[test]
 fn tit_for_tat() {
-    let mut inter = Interpreter::<ChoicesContext>::new();
+    let mut inter = Interpreter::new();
     let tit_for_tat = inter.bind("return context.otherPlayer.choices.at(-1) ?? COOPERATE;");
 
     let first_ctx = ChoicesContext::new(&[], &[]);
     let first_choice = inter.call(&tit_for_tat, first_ctx).unwrap();
 
-    assert_eq!(first_choice, Choice::Cooperate);
+    assert_eq!(first_choice, Cooperate);
 
-    let later_ctx = ChoicesContext::new(&[], &[Choice::Defect]);
+    let later_ctx = ChoicesContext::new(&[], &[Defect]);
     let later_choice = inter.call(&tit_for_tat, later_ctx).unwrap();
 
-    assert_eq!(later_choice, Choice::Defect);
-}
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-enum Choice {
-    Cooperate,
-    Defect,
-}
-
-impl ChoiceContext for Choice {
-    fn cooperate() -> Self {
-        Self::Cooperate
-    }
-
-    fn defect() -> Self {
-        Self::Defect
-    }
-
-    fn is_cooperate(self) -> bool {
-        matches!(self, Self::Cooperate)
-    }
+    assert_eq!(later_choice, Defect);
 }
 
 #[derive(Copy, Clone)]
@@ -76,9 +57,7 @@ impl TurnContext for DummyCtx {
 }
 
 impl PlayerContext for DummyCtx {
-    type Choice = Choice;
-
-    fn choices(&self) -> &[Self::Choice] {
+    fn choices(&self) -> &[Choice] {
         &[]
     }
 }
@@ -111,9 +90,7 @@ impl Context for ChoicesContext {
 struct ChoicesPlayerContext(&'static [Choice]);
 
 impl PlayerContext for ChoicesPlayerContext {
-    type Choice = Choice;
-
-    fn choices(&self) -> &[Self::Choice] {
+    fn choices(&self) -> &[Choice] {
         self.0
     }
 }

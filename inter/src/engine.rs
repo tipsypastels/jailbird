@@ -1,4 +1,4 @@
-use crate::{outcomes::Outcomes, Context, PlayerContext, TurnContext};
+use crate::{Context, PlayerContext, TurnContext};
 use boa_engine::{
     js_str,
     object::{
@@ -6,7 +6,7 @@ use boa_engine::{
         ObjectInitializer,
     },
     property::Attribute,
-    Context as Boa, JsObject, JsResult, JsStr, JsSymbol, JsValue, Source,
+    Context as Boa, JsObject, JsResult, JsStr, JsValue, Source,
 };
 
 #[derive(Debug)]
@@ -21,14 +21,10 @@ impl Engine {
         }
     }
 
-    pub fn init_outcome(&mut self, key: JsStr<'static>) -> JsSymbol {
-        let sym = JsSymbol::new(Some(key.into())).unwrap();
-
+    pub fn init_choice(&mut self, key: JsStr<'static>, b: bool) {
         self.boa
-            .register_global_property(key, sym.clone(), Attribute::empty())
-            .expect("duplicate outcome");
-
-        sym
+            .register_global_property(key, b, Attribute::empty())
+            .expect("duplicate choice");
     }
 
     pub fn init_function(&mut self, code: &str) -> JsFunction {
@@ -43,9 +39,9 @@ impl Engine {
         function.call(&JsValue::Undefined, &[], &mut self.boa)
     }
 
-    pub fn set_context(&mut self, ctx: impl Context, outcomes: &Outcomes) {
+    pub fn set_context(&mut self, ctx: impl Context) {
         let key = js_str!("__context__");
-        let value = self.context(ctx, outcomes);
+        let value = self.context(ctx);
 
         self.boa
             .global_object()
@@ -53,7 +49,7 @@ impl Engine {
             .expect("failed to set context global");
     }
 
-    fn context(&mut self, ctx: impl Context, outcomes: &Outcomes) -> JsObject {
+    fn context(&mut self, ctx: impl Context) -> JsObject {
         let boa = &mut self.boa;
         let attr = Attribute::empty();
 
@@ -63,15 +59,11 @@ impl Engine {
             .property(js_str!("total"), turn_ctx.total(), attr)
             .build();
 
-        fn _player_context(
-            boa: &mut Boa,
-            player: &impl PlayerContext,
-            outcomes: Outcomes,
-        ) -> JsObject {
+        fn _player_context(boa: &mut Boa, player: &impl PlayerContext) -> JsObject {
             let elements = player
                 .choices()
                 .iter()
-                .map(|c| outcomes.value_from_choice(c));
+                .map(|&c| JsValue::Boolean(c.is_cooperate()));
 
             let choices = JsArray::from_iter(elements, boa);
 
@@ -80,7 +72,7 @@ impl Engine {
                 .build()
         }
 
-        let mut player_context = |p| _player_context(boa, p, outcomes.clone());
+        let mut player_context = |p| _player_context(boa, p);
 
         let this_player_obj = player_context(ctx.this_player());
         let other_player_obj = player_context(ctx.other_player());

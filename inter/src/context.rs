@@ -1,3 +1,5 @@
+use jailbird_choice::Choice;
+
 pub trait Context {
     type Turn: TurnContext;
     type Player: PlayerContext;
@@ -13,14 +15,5 @@ pub trait TurnContext {
 }
 
 pub trait PlayerContext {
-    type Choice: ChoiceContext;
-
-    fn choices(&self) -> &[Self::Choice];
-}
-
-pub trait ChoiceContext: Copy {
-    fn cooperate() -> Self;
-    fn defect() -> Self;
-
-    fn is_cooperate(self) -> bool;
+    fn choices(&self) -> &[Choice];
 }

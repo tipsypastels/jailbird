@@ -1012,6 +1012,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "jailbird-choice"
+version = "0.1.0"
+dependencies = [
+ "implicit-clone 0.5.0",
+]
+
+[[package]]
 name = "jailbird-core"
 version = "0.1.0"
 dependencies = [
@@ -1025,6 +1032,7 @@ version = "0.1.0"
 dependencies = [
  "boa_engine",
  "implicit-clone 0.5.0",
+ "jailbird-choice",
 ]
 
 [[package]]

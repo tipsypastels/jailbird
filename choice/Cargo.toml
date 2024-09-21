@@ -1,9 +1,7 @@
 [package]
-name = "jailbird-inter"
+name = "jailbird-choice"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-boa_engine = "0.19.1"
 implicit-clone.workspace = true
-jailbird-choice = { path = "../choice" }

@@ -1,6 +1,7 @@
-use crate::{engine::Engine, outcomes::Outcomes, Context, PlayerContext};
+use crate::engine::Engine;
 use boa_engine::{object::builtins::JsFunction, JsError, JsValue};
 use implicit_clone::ImplicitClone;
+use jailbird_choice::Choice;
 use std::{error::Error, fmt};
 
 #[derive(Debug, Clone, ImplicitClone)]
@@ -16,17 +17,15 @@ impl Binding {
         Self { function }
     }
 
-    pub(crate) fn call<C>(&self, outcomes: &Outcomes, engine: &mut Engine) -> CallResult<C>
-    where
-        C: Context,
-    {
+    pub(crate) fn call(&self, engine: &mut Engine) -> CallResult {
         let value = engine
             .call_function(&self.function)
             .map_err(CallError::ThrownError)?;
 
-        let choice = outcomes
-            .choice_from_value::<<C::Player as PlayerContext>::Choice>(value)
-            .map_err(CallError::ExpectedChoice)?;
+        let choice = match value {
+            JsValue::Boolean(b) => Choice::from_bool(b),
+            value => return Err(CallError::ExpectedChoice { got_value: value }),
+        };
 
         Ok(choice)
     }
@@ -39,18 +38,18 @@ impl PartialEq for Binding {
     }
 }
 
-pub type CallResult<C> = Result<<<C as Context>::Player as PlayerContext>::Choice, CallError>;
+pub type CallResult = Result<Choice, CallError>;
 
 #[derive(Debug, Clone)]
 pub enum CallError {
-    ExpectedChoice(JsValue),
+    ExpectedChoice { got_value: JsValue },
     ThrownError(JsError),
 }
 
 impl fmt::Display for CallError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ExpectedChoice(value) => write!(f, "Expected choice, got {value:?}"),
+            Self::ExpectedChoice { got_value } => write!(f, "Expected choice, got {got_value:?}"),
             Self::ThrownError(error) => write!(f, "Failed to call binding: {error}"),
         }
     }

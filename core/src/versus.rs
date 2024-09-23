@@ -8,7 +8,7 @@ pub struct Versus {
     pub player1: Player,
     pub player2: Player,
     pub turn: Turn,
-    pub matrix: ChoiceMatrix,
+    matrix: ChoiceMatrix,
 }
 
 impl Versus {

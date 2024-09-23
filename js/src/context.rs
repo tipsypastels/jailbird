@@ -15,5 +15,14 @@ pub trait Turn {
 }
 
 pub trait Player {
+    fn score(&self) -> i32;
     fn choices(&self) -> &[Choice];
+
+    fn ever_cooperated(&self) -> bool {
+        self.choices().iter().any(|c| c.is_cooperate())
+    }
+
+    fn ever_defected(&self) -> bool {
+        self.choices().iter().any(|c| c.is_defect())
+    }
 }

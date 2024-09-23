@@ -26,6 +26,27 @@ fn tit_for_tat() {
     assert_eq!(later_choice, Defect);
 }
 
+#[test]
+fn grudger() {
+    let mut js = Js::new();
+    let grudger = js.bind("return context.otherPlayer.everDefected ? DEFECT : COOPERATE;");
+
+    let first_ctx = ChoicesContext::new(&[], &[]);
+    let first_choice = js.call(&grudger, first_ctx).unwrap();
+
+    assert_eq!(first_choice, Cooperate);
+
+    let later_ctx = ChoicesContext::new(&[], &[Cooperate]);
+    let later_choice = js.call(&grudger, later_ctx).unwrap();
+
+    assert_eq!(later_choice, Cooperate);
+
+    let even_later_ctx = ChoicesContext::new(&[], &[Defect, Cooperate]);
+    let even_later_choice = js.call(&grudger, even_later_ctx).unwrap();
+
+    assert_eq!(even_later_choice, Defect);
+}
+
 #[derive(Copy, Clone)]
 struct DummyCtx;
 
@@ -57,6 +78,10 @@ impl Turn for DummyCtx {
 }
 
 impl Player for DummyCtx {
+    fn score(&self) -> i32 {
+        0
+    }
+
     fn choices(&self) -> &[Choice] {
         &[]
     }
@@ -91,6 +116,10 @@ impl Context for ChoicesContext {
 struct ChoicesPlayerContext(&'static [Choice]);
 
 impl Player for ChoicesPlayerContext {
+    fn score(&self) -> i32 {
+        0
+    }
+
     fn choices(&self) -> &[Choice] {
         self.0
     }

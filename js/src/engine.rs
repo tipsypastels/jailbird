@@ -60,15 +60,23 @@ impl Engine {
             .build();
 
         fn _player_context(boa: &mut Boa, player: impl Player) -> JsObject {
+            let attr = Attribute::empty();
             let elements = player
                 .choices()
                 .iter()
                 .map(|&c| JsValue::Boolean(c.is_cooperate()));
 
             let choices = JsArray::from_iter(elements, boa);
+            
+            let score = player.score();
+            let ever_c = player.ever_cooperated();
+            let ever_d = player.ever_defected();
 
             ObjectInitializer::new(boa)
-                .property(js_str!("choices"), choices, Attribute::empty())
+                .property(js_str!("score"), score, attr)
+                .property(js_str!("choices"), choices, attr)
+                .property(js_str!("everCooperated"), ever_c, attr)
+                .property(js_str!("everDefected"), ever_d, attr)
                 .build()
         }
 

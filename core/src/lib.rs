@@ -4,11 +4,13 @@ mod function;
 mod player;
 mod strategy;
 mod turn;
+mod versus;
 
 pub use jailbird_choice::*;
 pub use player::{History, Player};
 pub use strategy::{Strategy, StrategyBuilder};
 pub use turn::Turn;
+pub use versus::{Versus, VersusState};
 
 #[derive(Debug)]
 pub struct Runtime {

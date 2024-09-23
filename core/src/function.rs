@@ -1,4 +1,4 @@
-use crate::{Player, Turn};
+use crate::{Player, Runtime, Turn};
 use implicit_clone::{unsync::IString, ImplicitClone};
 use jailbird_choice::Choice;
 
@@ -19,13 +19,26 @@ pub(crate) enum FunctionInner {
     Js(jailbird_js::Function),
 }
 
+use FunctionInner as Fi;
+
 impl Function {
+    pub fn call(&self, rt: &mut Runtime, ctx: Context) -> Choice {
+        match &self.0 {
+            Fi::Native(func) => func(ctx),
+            #[cfg(feature = "js")]
+            Fi::NativeWithJsExample { func, .. } => func(ctx),
+            #[cfg(feature = "js")]
+            // TODO: Don't unwrap.
+            Fi::Js(func) => rt.js.call(func, ctx).unwrap(),
+        }
+    }
+
     #[cfg(feature = "js")]
     pub fn js_code(&self) -> IString {
         match &self.0 {
-            FunctionInner::Native(_) => "[native code]".into(),
-            FunctionInner::NativeWithJsExample { example, .. } => (*example).into(),
-            FunctionInner::Js(func) => func.body(),
+            Fi::Native(_) => "[native code]".into(),
+            Fi::NativeWithJsExample { example, .. } => (*example).into(),
+            Fi::Js(func) => func.body(),
         }
     }
 }

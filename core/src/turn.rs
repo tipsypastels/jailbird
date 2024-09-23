@@ -16,7 +16,7 @@ impl Turn {
         self.current == self.total
     }
 
-    pub fn next(&self) -> Option<Self> {
+    pub fn next(self) -> Option<Self> {
         (!self.done()).then(|| Self {
             current: self.current + 1,
             total: self.total,

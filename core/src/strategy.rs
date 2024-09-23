@@ -1,8 +1,9 @@
 use crate::{
-    function::{Function, FunctionInner, NativeFunction},
+    function::{Context, Function, FunctionInner, NativeFunction},
     Runtime,
 };
 use implicit_clone::{unsync::IString, ImplicitClone};
+use jailbird_choice::Choice;
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 pub struct Strategy {
@@ -18,6 +19,10 @@ impl Strategy {
 
     pub fn desc(&self) -> Option<IString> {
         self.desc.clone()
+    }
+
+    pub(crate) fn call(&self, rt: &mut Runtime, ctx: Context) -> Choice {
+        self.func.call(rt, ctx)
     }
 }
 

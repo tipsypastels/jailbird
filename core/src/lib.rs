@@ -12,10 +12,11 @@ pub use jailbird_choice::*;
 pub use player::{Choices, Player};
 pub use strategy::{Strategy, StrategyBuilder};
 pub use turn::Turn;
-pub use versus::{Versus, VersusState};
+pub use versus::{Versus, VersusEnding, VersusState, VersusWinnerOrLoser};
 pub use view::View;
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Runtime {
     #[cfg(feature = "js")]
     js: jailbird_js::Js,

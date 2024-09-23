@@ -89,6 +89,12 @@ impl Choices {
     }
 }
 
+impl FromIterator<Choice> for Choices {
+    fn from_iter<T: IntoIterator<Item = Choice>>(iter: T) -> Self {
+        Self(IArray::<Choice>::from_iter(iter))
+    }
+}
+
 impl Deref for Choices {
     type Target = [Choice];
 

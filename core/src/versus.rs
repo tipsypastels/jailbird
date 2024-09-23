@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::{Player, Runtime, Turn, View};
 use implicit_clone::ImplicitClone;
 use jailbird_choice::{Choice, ChoiceMatrix};
@@ -36,7 +38,28 @@ impl Versus {
 
     pub fn next(self, rt: &mut Runtime) -> VersusState {
         let Some(turn) = self.turn.next() else {
-            return VersusState::Done;
+            let (player1, player2) = (self.player1, self.player2);
+
+            macro_rules! win_lose {
+                ($p1_won:literal) => {
+                    VersusEnding::WinLose {
+                        player1: VersusWinnerOrLoser {
+                            player: player1,
+                            won: $p1_won,
+                        },
+                        player2: VersusWinnerOrLoser {
+                            player: player2,
+                            won: !$p1_won,
+                        },
+                    }
+                };
+            }
+
+            return match () {
+                () if player1.score > player2.score => VersusState::Ending(win_lose!(true)),
+                () if player2.score > player1.score => VersusState::Ending(win_lose!(false)),
+                () => VersusState::Ending(VersusEnding::Tie { player1, player2 }),
+            };
         };
 
         macro_rules! view {
@@ -63,11 +86,60 @@ impl Versus {
             matrix: self.matrix,
         })
     }
+
+    pub fn next_to_ending(self, rt: &mut Runtime) -> VersusEnding {
+        match self.next(rt) {
+            VersusState::Ongoing(versus) => versus.next_to_ending(rt),
+            VersusState::Ending(ending) => ending,
+        }
+    }
 }
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 pub enum VersusState {
     Ongoing(Versus),
-    // TODO
-    Done,
+    Ending(VersusEnding),
+}
+
+#[derive(Debug, Clone, ImplicitClone, PartialEq)]
+pub enum VersusEnding {
+    WinLose {
+        player1: VersusWinnerOrLoser,
+        player2: VersusWinnerOrLoser,
+    },
+    Tie {
+        player1: Player,
+        player2: Player,
+    },
+}
+
+impl VersusEnding {
+    pub fn into_win_lose(self) -> Result<(VersusWinnerOrLoser, VersusWinnerOrLoser), Self> {
+        match self {
+            Self::WinLose { player1, player2 } => Ok((player1, player2)),
+            other => Err(other),
+        }
+    }
+
+    pub fn into_tie(self) -> Result<(Player, Player), Self> {
+        match self {
+            Self::Tie { player1, player2 } => Ok((player1, player2)),
+            other => Err(other),
+        }
+    }
+}
+
+#[derive(Debug, Clone, ImplicitClone, PartialEq)]
+#[non_exhaustive]
+pub struct VersusWinnerOrLoser {
+    pub player: Player,
+    pub won: bool,
+}
+
+impl Deref for VersusWinnerOrLoser {
+    type Target = Player;
+
+    fn deref(&self) -> &Self::Target {
+        &self.player
+    }
 }

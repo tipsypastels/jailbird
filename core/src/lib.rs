@@ -31,7 +31,7 @@ impl Runtime {
         self.strategy(|s| {
             s.name("Always Cooperate")
                 .desc("Always cooperates.")
-                .native_with_js_example(|_| Cooperate, "return COOPERATE;")
+                .builtin(|_| Cooperate, "return COOPERATE;")
                 .build()
         })
     }
@@ -40,7 +40,7 @@ impl Runtime {
         self.strategy(|s| {
             s.name("Always Defect")
                 .desc("Always defects.")
-                .native_with_js_example(|_| Defect, "return DEFECT;")
+                .builtin(|_| Defect, "return DEFECT;")
                 .build()
         })
     }
@@ -51,7 +51,7 @@ impl Runtime {
                 .desc(
                     "Copies the other player's last move, or cooperates if this is the first turn.",
                 )
-                .native_with_js_example(
+                .builtin(
                     |c| c.other_player.last().copied().unwrap_or(Cooperate),
                     "return context.otherPlayer.choices.at(-1) ?? COOPERATE",
                 )

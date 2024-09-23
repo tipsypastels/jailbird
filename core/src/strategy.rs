@@ -96,6 +96,24 @@ impl<'rt> StrategyBuilder<'rt, Step1> {
             },
         }
     }
+
+    #[cfg(feature = "inter")]
+    pub(crate) fn builtin(
+        self,
+        func: NativeFunction,
+        example: &'static str,
+    ) -> StrategyBuilder<'rt, Step2> {
+        self.native_with_js_example(func, example)
+    }
+
+    #[cfg(not(feature = "inter"))]
+    pub(crate) fn builtin(
+        self,
+        func: NativeFunction,
+        _: &'static str,
+    ) -> StrategyBuilder<'rt, Step2> {
+        self.native(func)
+    }
 }
 
 impl<'rt> StrategyBuilder<'rt, Step2> {

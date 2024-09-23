@@ -1,9 +1,11 @@
 #![warn(missing_debug_implementations)]
 
 mod function;
+mod player;
 mod strategy;
 
-use jailbird_choice::Choice::{Cooperate, Defect};
+pub use jailbird_choice::*;
+pub use player::{History, Player};
 pub use strategy::{Strategy, StrategyBuilder};
 
 #[derive(Debug)]

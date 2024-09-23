@@ -45,8 +45,8 @@ impl From<Strategy> for Player {
     }
 }
 
-#[cfg(feature = "inter")]
-impl jailbird_inter::Player for Player {
+#[cfg(feature = "js")]
+impl jailbird_js::Player for Player {
     fn choices(&self) -> &[Choice] {
         &self.history.choices
     }

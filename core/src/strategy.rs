@@ -68,7 +68,7 @@ impl<'rt> StrategyBuilder<'rt, Step1> {
         }
     }
 
-    #[cfg(feature = "inter")]
+    #[cfg(feature = "js")]
     pub fn native_with_js_example(
         self,
         func: NativeFunction,
@@ -84,20 +84,20 @@ impl<'rt> StrategyBuilder<'rt, Step1> {
         }
     }
 
-    #[cfg(feature = "inter")]
+    #[cfg(feature = "js")]
     pub fn js(self, code: &str) -> StrategyBuilder<'rt, Step2> {
-        let func = self.rt.inter.bind(code);
+        let func = self.rt.js.bind(code);
         StrategyBuilder {
             rt: self.rt,
             desc: self.desc,
             step: Step2 {
                 name: self.step.name,
-                func: Function(FunctionInner::Inter(func)),
+                func: Function(FunctionInner::Js(func)),
             },
         }
     }
 
-    #[cfg(feature = "inter")]
+    #[cfg(feature = "js")]
     pub(crate) fn builtin(
         self,
         func: NativeFunction,
@@ -106,7 +106,7 @@ impl<'rt> StrategyBuilder<'rt, Step1> {
         self.native_with_js_example(func, example)
     }
 
-    #[cfg(not(feature = "inter"))]
+    #[cfg(not(feature = "js"))]
     pub(crate) fn builtin(
         self,
         func: NativeFunction,

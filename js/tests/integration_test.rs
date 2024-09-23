@@ -1,27 +1,27 @@
 use jailbird_choice::*;
-use jailbird_inter::*;
+use jailbird_js::*;
 
 #[test]
 fn always_cooperate() {
-    let mut inter = Interpreter::new();
-    let always_cooperate = inter.bind("return COOPERATE;");
-    let choice = inter.call(&always_cooperate, DummyCtx).unwrap();
+    let mut js = Js::new();
+    let always_cooperate = js.bind("return COOPERATE;");
+    let choice = js.call(&always_cooperate, DummyCtx).unwrap();
 
     assert_eq!(choice, Cooperate);
 }
 
 #[test]
 fn tit_for_tat() {
-    let mut inter = Interpreter::new();
-    let tit_for_tat = inter.bind("return context.otherPlayer.choices.at(-1) ?? COOPERATE;");
+    let mut js = Js::new();
+    let tit_for_tat = js.bind("return context.otherPlayer.choices.at(-1) ?? COOPERATE;");
 
     let first_ctx = ChoicesContext::new(&[], &[]);
-    let first_choice = inter.call(&tit_for_tat, first_ctx).unwrap();
+    let first_choice = js.call(&tit_for_tat, first_ctx).unwrap();
 
     assert_eq!(first_choice, Cooperate);
 
     let later_ctx = ChoicesContext::new(&[], &[Defect]);
-    let later_choice = inter.call(&tit_for_tat, later_ctx).unwrap();
+    let later_choice = js.call(&tit_for_tat, later_ctx).unwrap();
 
     assert_eq!(later_choice, Defect);
 }

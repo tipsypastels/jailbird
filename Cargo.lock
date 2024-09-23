@@ -1024,11 +1024,11 @@ version = "0.1.0"
 dependencies = [
  "implicit-clone 0.5.0",
  "jailbird-choice",
- "jailbird-inter",
+ "jailbird-js",
 ]
 
 [[package]]
-name = "jailbird-inter"
+name = "jailbird-js"
 version = "0.1.0"
 dependencies = [
  "boa_engine",

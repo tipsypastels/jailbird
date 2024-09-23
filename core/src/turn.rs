@@ -30,8 +30,8 @@ impl From<u32> for Turn {
     }
 }
 
-#[cfg(feature = "inter")]
-impl jailbird_inter::Turn for Turn {
+#[cfg(feature = "js")]
+impl jailbird_js::Turn for Turn {
     fn cur(&self) -> i32 {
         self.current as i32
     }

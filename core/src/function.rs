@@ -10,22 +10,22 @@ pub struct Function(pub(crate) FunctionInner);
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 pub(crate) enum FunctionInner {
     Native(NativeFunction),
-    #[cfg(feature = "inter")]
+    #[cfg(feature = "js")]
     NativeWithJsExample {
         func: NativeFunction,
         example: &'static str,
     },
-    #[cfg(feature = "inter")]
-    Inter(jailbird_inter::Function),
+    #[cfg(feature = "js")]
+    Js(jailbird_js::Function),
 }
 
 impl Function {
-    #[cfg(feature = "inter")]
-    pub fn js(&self) -> IString {
+    #[cfg(feature = "js")]
+    pub fn js_code(&self) -> IString {
         match &self.0 {
             FunctionInner::Native(_) => "[native code]".into(),
             FunctionInner::NativeWithJsExample { example, .. } => (*example).into(),
-            FunctionInner::Inter(func) => func.body(),
+            FunctionInner::Js(func) => func.body(),
         }
     }
 }
@@ -38,8 +38,8 @@ pub struct Context {
     pub other_player: Player,
 }
 
-#[cfg(feature = "inter")]
-impl jailbird_inter::Context for Context {
+#[cfg(feature = "js")]
+impl jailbird_js::Context for Context {
     type Turn = Turn;
     type Player = Player;
 

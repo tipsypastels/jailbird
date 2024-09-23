@@ -11,11 +11,11 @@ mod function;
 pub use context::{Context, Player, Turn};
 pub use function::{CallError, CallResult, Function};
 
-pub struct Interpreter {
+pub struct Js {
     engine: Engine,
 }
 
-impl Interpreter {
+impl Js {
     pub fn new() -> Self {
         let mut engine = Engine::new();
 
@@ -35,14 +35,14 @@ impl Interpreter {
     }
 }
 
-impl Default for Interpreter {
+impl Default for Js {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl fmt::Debug for Interpreter {
+impl fmt::Debug for Js {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Interpreter").finish_non_exhaustive()
+        f.debug_struct("Js").finish_non_exhaustive()
     }
 }

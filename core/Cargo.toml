@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["inter"]
-inter = ["dep:jailbird-inter"]
+default = ["js"]
+js = ["dep:jailbird-js"]
 
 [dependencies]
 jailbird-choice = { path = "../choice" }
-jailbird-inter = { path = "../inter", optional = true }
+jailbird-js = { path = "../js", optional = true }
 implicit-clone.workspace = true

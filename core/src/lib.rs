@@ -12,15 +12,15 @@ pub use turn::Turn;
 
 #[derive(Debug)]
 pub struct Runtime {
-    #[cfg(feature = "inter")]
-    inter: jailbird_inter::Interpreter,
+    #[cfg(feature = "js")]
+    js: jailbird_js::Js,
 }
 
 impl Runtime {
     pub fn new() -> Self {
         Self {
-            #[cfg(feature = "inter")]
-            inter: jailbird_inter::Interpreter::new(),
+            #[cfg(feature = "js")]
+            js: jailbird_js::Js::new(),
         }
     }
 

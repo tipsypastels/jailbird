@@ -9,7 +9,7 @@ mod versus;
 mod view;
 
 pub use jailbird_choice::*;
-pub use player::Player;
+pub use player::{Choices, Player};
 pub use strategy::{Strategy, StrategyBuilder};
 pub use turn::Turn;
 pub use versus::{Versus, VersusState};

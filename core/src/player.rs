@@ -1,14 +1,18 @@
 use crate::Strategy;
 use implicit_clone::{unsync::IArray, ImplicitClone};
 use jailbird_choice::Choice;
-use std::iter::once;
+use std::{
+    iter::{once, Copied},
+    ops::Deref,
+    slice,
+};
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 #[non_exhaustive]
 pub struct Player {
     pub score: u32,
     pub strategy: Strategy,
-    pub choices: IArray<Choice>,
+    pub choices: Choices,
     pub ever_cooperated: bool,
     pub ever_defected: bool,
 }
@@ -18,7 +22,7 @@ impl Player {
         Self {
             score: 0,
             strategy,
-            choices: IArray::default(),
+            choices: Choices(Default::default()),
             ever_cooperated: false,
             ever_defected: false,
         }
@@ -36,7 +40,7 @@ impl Player {
         Self {
             score: score + gain,
             strategy,
-            choices: choices.iter().chain(once(choice)).collect(),
+            choices: choices.next(choice),
             ever_cooperated: ever_cooperated || choice.is_cooperate(),
             ever_defected: ever_defected || choice.is_defect(),
         }
@@ -65,5 +69,30 @@ impl jailbird_js::PlayerView for Player {
 
     fn ever_defected(&self) -> bool {
         self.ever_defected
+    }
+}
+
+#[derive(Debug, Clone, ImplicitClone, PartialEq)]
+pub struct Choices(IArray<Choice>);
+
+impl Choices {
+    fn next(self, choice: Choice) -> Self {
+        Self(self.0.iter().chain(once(choice)).collect())
+    }
+
+    pub fn as_slice(&self) -> &[Choice] {
+        &self.0
+    }
+
+    pub fn iter(&self) -> Copied<slice::Iter<'_, Choice>> {
+        self.as_slice().iter().copied()
+    }
+}
+
+impl Deref for Choices {
+    type Target = [Choice];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

@@ -8,5 +8,6 @@ default = ["inter"]
 inter = ["dep:jailbird-inter"]
 
 [dependencies]
+jailbird-choice = { path = "../choice" }
 jailbird-inter = { path = "../inter", optional = true }
 implicit-clone.workspace = true

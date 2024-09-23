@@ -1,25 +1,27 @@
 use crate::engine::Engine;
 use boa_engine::{object::builtins::JsFunction, JsError, JsValue};
-use implicit_clone::ImplicitClone;
+use implicit_clone::{unsync::IString, ImplicitClone};
 use jailbird_choice::Choice;
 use std::{error::Error, fmt};
 
 #[derive(Debug, Clone, ImplicitClone)]
-pub struct Binding {
-    function: JsFunction,
+pub struct Function {
+    body: IString,
+    binding: JsFunction,
 }
 
-impl Binding {
+impl Function {
     pub(crate) fn new(body: &str, engine: &mut Engine) -> Self {
         let code = format!("() => {{const context = globalThis.__context__;{body}}}");
-        let function = engine.init_function(&code);
+        let binding = engine.init_function(&code);
+        let body = body.to_string().into();
 
-        Self { function }
+        Self { body, binding }
     }
 
     pub(crate) fn call(&self, engine: &mut Engine) -> CallResult {
         let value = engine
-            .call_function(&self.function)
+            .call_function(&self.binding)
             .map_err(CallError::ThrownError)?;
 
         let choice = match value {
@@ -29,12 +31,16 @@ impl Binding {
 
         Ok(choice)
     }
+
+    pub fn body(&self) -> IString {
+        self.body.clone()
+    }
 }
 
 // JsObject impls this but JsFunction which derefs to it does not for some reason.
-impl PartialEq for Binding {
+impl PartialEq for Function {
     fn eq(&self, other: &Self) -> bool {
-        *self.function == *other.function
+        self.body == other.body && *self.binding == *other.binding
     }
 }
 

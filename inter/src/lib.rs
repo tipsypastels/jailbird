@@ -4,12 +4,12 @@ use self::engine::Engine;
 use boa_engine::js_str;
 use std::fmt;
 
-mod binding;
 mod context;
 mod engine;
+mod function;
 
-pub use binding::{Binding, CallError, CallResult};
 pub use context::{Context, PlayerContext, TurnContext};
+pub use function::{CallError, CallResult, Function};
 
 pub struct Interpreter {
     engine: Engine,
@@ -25,13 +25,13 @@ impl Interpreter {
         Self { engine }
     }
 
-    pub fn bind(&mut self, body: &str) -> Binding {
-        Binding::new(body, &mut self.engine)
+    pub fn bind(&mut self, body: &str) -> Function {
+        Function::new(body, &mut self.engine)
     }
 
-    pub fn call<C: Context>(&mut self, binding: &Binding, ctx: C) -> CallResult {
+    pub fn call<C: Context>(&mut self, function: &Function, ctx: C) -> CallResult {
         self.engine.set_context(ctx);
-        binding.call(&mut self.engine)
+        function.call(&mut self.engine)
     }
 }
 

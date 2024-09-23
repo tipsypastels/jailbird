@@ -1,14 +1,14 @@
 use crate::Strategy;
 use implicit_clone::{unsync::IArray, ImplicitClone};
 use jailbird_choice::Choice;
-use std::iter::once;
+use std::{iter::once, ops::Deref};
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 #[non_exhaustive]
 pub struct Player {
-    score: u32,
-    strategy: Strategy,
-    history: History,
+    pub score: u32,
+    pub strategy: Strategy,
+    pub history: History,
 }
 
 impl Player {
@@ -46,7 +46,7 @@ impl From<Strategy> for Player {
 }
 
 #[cfg(feature = "inter")]
-impl jailbird_inter::PlayerContext for Player {
+impl jailbird_inter::Player for Player {
     fn choices(&self) -> &[Choice] {
         &self.history.choices
     }
@@ -58,4 +58,12 @@ pub struct History {
     pub choices: IArray<Choice>,
     pub ever_cooperated: bool,
     pub ever_defected: bool,
+}
+
+impl Deref for History {
+    type Target = [Choice];
+
+    fn deref(&self) -> &Self::Target {
+        &self.choices
+    }
 }

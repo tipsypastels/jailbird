@@ -1,4 +1,4 @@
-use crate::{Context, PlayerContext, TurnContext};
+use crate::{Context, Player, Turn};
 use boa_engine::{
     js_str,
     object::{
@@ -55,11 +55,11 @@ impl Engine {
 
         let turn_ctx = ctx.turn();
         let turn_obj = ObjectInitializer::new(boa)
-            .property(js_str!("current"), turn_ctx.current(), attr)
-            .property(js_str!("total"), turn_ctx.total(), attr)
+            .property(js_str!("cur"), turn_ctx.cur(), attr)
+            .property(js_str!("max"), turn_ctx.max(), attr)
             .build();
 
-        fn _player_context(boa: &mut Boa, player: &impl PlayerContext) -> JsObject {
+        fn _player_context(boa: &mut Boa, player: impl Player) -> JsObject {
             let elements = player
                 .choices()
                 .iter()

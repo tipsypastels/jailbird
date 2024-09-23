@@ -8,7 +8,7 @@ mod context;
 mod engine;
 mod function;
 
-pub use context::{Context, PlayerContext, TurnContext};
+pub use context::{Context, Player, Turn};
 pub use function::{CallError, CallResult, Function};
 
 pub struct Interpreter {

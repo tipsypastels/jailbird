@@ -1,7 +1,8 @@
+use crate::{Player, Turn};
 use implicit_clone::{unsync::IString, ImplicitClone};
 use jailbird_choice::Choice;
 
-pub(crate) type NativeFunction = fn(Context<'_>) -> Choice;
+pub(crate) type NativeFunction = fn(Context) -> Choice;
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 pub struct Function(pub(crate) FunctionInner);
@@ -29,8 +30,28 @@ impl Function {
     }
 }
 
-#[derive(Debug, Copy, Clone, ImplicitClone, PartialEq)]
-pub struct Context<'a> {
-    pub this_player: &'a [Choice],
-    pub other_player: &'a [Choice],
+#[derive(Debug, Clone, ImplicitClone, PartialEq)]
+#[non_exhaustive]
+pub struct Context {
+    pub turn: Turn,
+    pub this_player: Player,
+    pub other_player: Player,
+}
+
+#[cfg(feature = "inter")]
+impl jailbird_inter::Context for Context {
+    type Turn = Turn;
+    type Player = Player;
+
+    fn turn(&self) -> Self::Turn {
+        self.turn.clone()
+    }
+
+    fn this_player(&self) -> Self::Player {
+        self.this_player.clone()
+    }
+
+    fn other_player(&self) -> Self::Player {
+        self.other_player.clone()
+    }
 }

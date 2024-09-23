@@ -3,10 +3,12 @@
 mod function;
 mod player;
 mod strategy;
+mod turn;
 
 pub use jailbird_choice::*;
 pub use player::{History, Player};
 pub use strategy::{Strategy, StrategyBuilder};
+pub use turn::Turn;
 
 #[derive(Debug)]
 pub struct Runtime {
@@ -54,7 +56,7 @@ impl Runtime {
                     "Copies the other player's last move, or cooperates if this is the first turn.",
                 )
                 .builtin(
-                    |c| c.other_player.last().copied().unwrap_or(Cooperate),
+                    |c| c.other_player.history.last().copied().unwrap_or(Cooperate),
                     "return context.otherPlayer.choices.at(-1) ?? COOPERATE",
                 )
                 .build()

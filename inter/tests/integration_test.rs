@@ -37,26 +37,26 @@ impl Context for DummyCtx {
         *self
     }
 
-    fn this_player(&self) -> &Self::Player {
-        self
+    fn this_player(&self) -> Self::Player {
+        *self
     }
 
-    fn other_player(&self) -> &Self::Player {
-        self
+    fn other_player(&self) -> Self::Player {
+        *self
     }
 }
 
-impl TurnContext for DummyCtx {
-    fn current(&self) -> i32 {
+impl Turn for DummyCtx {
+    fn cur(&self) -> i32 {
         1
     }
 
-    fn total(&self) -> i32 {
+    fn max(&self) -> i32 {
         2
     }
 }
 
-impl PlayerContext for DummyCtx {
+impl Player for DummyCtx {
     fn choices(&self) -> &[Choice] {
         &[]
     }
@@ -78,18 +78,19 @@ impl Context for ChoicesContext {
         DummyCtx
     }
 
-    fn this_player(&self) -> &Self::Player {
-        &self.0
+    fn this_player(&self) -> Self::Player {
+        self.0
     }
 
-    fn other_player(&self) -> &Self::Player {
-        &self.1
+    fn other_player(&self) -> Self::Player {
+        self.1
     }
 }
 
+#[derive(Copy, Clone)]
 struct ChoicesPlayerContext(&'static [Choice]);
 
-impl PlayerContext for ChoicesPlayerContext {
+impl Player for ChoicesPlayerContext {
     fn choices(&self) -> &[Choice] {
         self.0
     }

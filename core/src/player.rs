@@ -1,14 +1,16 @@
 use crate::Strategy;
 use implicit_clone::{unsync::IArray, ImplicitClone};
 use jailbird_choice::Choice;
-use std::{iter::once, ops::Deref};
+use std::iter::once;
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 #[non_exhaustive]
 pub struct Player {
     pub score: u32,
     pub strategy: Strategy,
-    pub history: History,
+    pub choices: IArray<Choice>,
+    pub ever_cooperated: bool,
+    pub ever_defected: bool,
 }
 
 impl Player {
@@ -16,7 +18,9 @@ impl Player {
         Self {
             score: 0,
             strategy,
-            history: Default::default(),
+            choices: IArray::default(),
+            ever_cooperated: false,
+            ever_defected: false,
         }
     }
 
@@ -24,17 +28,17 @@ impl Player {
         let Self {
             score,
             strategy,
-            history,
+            choices,
+            ever_cooperated,
+            ever_defected,
         } = self;
 
         Self {
             score: score + gain,
             strategy,
-            history: History {
-                choices: history.iter().chain(once(choice)).collect(),
-                ever_cooperated: history.ever_cooperated || choice.is_cooperate(),
-                ever_defected: history.ever_defected || choice.is_defect(),
-            },
+            choices: choices.iter().chain(once(choice)).collect(),
+            ever_cooperated: ever_cooperated || choice.is_cooperate(),
+            ever_defected: ever_defected || choice.is_defect(),
         }
     }
 }
@@ -52,30 +56,14 @@ impl jailbird_js::Player for Player {
     }
 
     fn choices(&self) -> &[Choice] {
-        &self.history
+        &self.choices
     }
 
     fn ever_cooperated(&self) -> bool {
-        self.history.ever_cooperated
+        self.ever_cooperated
     }
 
     fn ever_defected(&self) -> bool {
-        self.history.ever_defected
-    }
-}
-
-#[derive(Debug, Default, Clone, ImplicitClone, PartialEq)]
-#[non_exhaustive]
-pub struct History {
-    pub choices: IArray<Choice>,
-    pub ever_cooperated: bool,
-    pub ever_defected: bool,
-}
-
-impl Deref for History {
-    type Target = IArray<Choice>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.choices
+        self.ever_defected
     }
 }

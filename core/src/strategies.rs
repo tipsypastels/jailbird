@@ -61,14 +61,14 @@ mod impls {
 
     pub fn tit_for_tat(ctx: Context) -> Choice {
         ctx.other_player
-            .history
+            .choices
             .last()
             .copied()
             .unwrap_or(Cooperate)
     }
 
     pub fn grudger(ctx: Context) -> Choice {
-        if ctx.other_player.history.ever_defected {
+        if ctx.other_player.ever_defected {
             Defect
         } else {
             Cooperate

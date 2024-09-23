@@ -27,7 +27,7 @@ impl Runtime {
                 )
                 .builtin(
                     impls::tit_for_tat,
-                    "return context.otherPlayer.choices.at(-1) ?? COOPERATE",
+                    "return view.otherPlayer.choices.at(-1) ?? COOPERATE",
                 )
                 .build()
         })
@@ -39,36 +39,36 @@ impl Runtime {
                 .desc("Defects if the other player has ever defected, otherwise cooperates.")
                 .builtin(
                     impls::grudger,
-                    "return context.otherPlayer.everDefected ? DEFECT : COOPERATE;",
+                    "return view.otherPlayer.everDefected ? DEFECT : COOPERATE;",
                 )
                 .build()
         })
     }
 }
 
-// Don't accidentally use jailbird_js context traits in here.
+// Don't accidentally use jailbird_js view traits in here.
 mod impls {
-    use crate::function::Context;
+    use crate::View;
     use jailbird_choice::*;
 
-    pub fn always_cooperate(_: Context) -> Choice {
+    pub fn always_cooperate(_: View) -> Choice {
         Cooperate
     }
 
-    pub fn always_defect(_: Context) -> Choice {
+    pub fn always_defect(_: View) -> Choice {
         Defect
     }
 
-    pub fn tit_for_tat(ctx: Context) -> Choice {
-        ctx.other_player
+    pub fn tit_for_tat(view: View) -> Choice {
+        view.other_player
             .choices
             .last()
             .copied()
             .unwrap_or(Cooperate)
     }
 
-    pub fn grudger(ctx: Context) -> Choice {
-        if ctx.other_player.ever_defected {
+    pub fn grudger(view: View) -> Choice {
+        if view.other_player.ever_defected {
             Defect
         } else {
             Cooperate

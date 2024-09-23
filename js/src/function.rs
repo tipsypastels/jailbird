@@ -12,7 +12,7 @@ pub struct Function {
 
 impl Function {
     pub(crate) fn new(body: &str, engine: &mut Engine) -> Self {
-        let code = format!("() => {{const context = globalThis.__context__;{body}}}");
+        let code = format!("() => {{const view = globalThis.__view__;{body}}}");
         let binding = engine.init_function(&code);
         let body = body.to_string().into();
 

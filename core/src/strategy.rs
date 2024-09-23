@@ -1,6 +1,6 @@
 use crate::{
-    function::{Context, Function, FunctionInner, NativeFunction},
-    Runtime,
+    function::{Function, FunctionInner, NativeFunction},
+    Runtime, View,
 };
 use implicit_clone::{unsync::IString, ImplicitClone};
 use jailbird_choice::Choice;
@@ -21,8 +21,8 @@ impl Strategy {
         self.desc.clone()
     }
 
-    pub(crate) fn call(&self, rt: &mut Runtime, ctx: Context) -> Choice {
-        self.func.call(rt, ctx)
+    pub(crate) fn call(&self, rt: &mut Runtime, view: View) -> Choice {
+        self.func.call(rt, view)
     }
 }
 

@@ -1,20 +1,20 @@
 use jailbird_choice::Choice;
 
-pub trait Context {
-    type Turn: Turn;
-    type Player: Player;
+pub trait View {
+    type Turn: TurnView;
+    type Player: PlayerView;
 
     fn turn(&self) -> Self::Turn;
     fn this_player(&self) -> Self::Player;
     fn other_player(&self) -> Self::Player;
 }
 
-pub trait Turn {
+pub trait TurnView {
     fn cur(&self) -> i32;
     fn max(&self) -> i32;
 }
 
-pub trait Player {
+pub trait PlayerView {
     fn score(&self) -> i32;
     fn choices(&self) -> &[Choice];
 

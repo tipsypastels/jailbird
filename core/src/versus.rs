@@ -1,4 +1,4 @@
-use crate::{function::Context, Player, Runtime, Turn};
+use crate::{Player, Runtime, Turn, View};
 use implicit_clone::ImplicitClone;
 use jailbird_choice::{Choice, ChoiceMatrix};
 
@@ -39,9 +39,9 @@ impl Versus {
             return VersusState::Done;
         };
 
-        macro_rules! ctx {
+        macro_rules! view {
             ($this:ident $other:ident) => {
-                Context {
+                View {
                     turn: turn.clone(),
                     this_player: self.$this.clone(),
                     other_player: self.$other.clone(),
@@ -49,8 +49,8 @@ impl Versus {
             };
         }
 
-        let c1 = self.player1.strategy.call(rt, ctx!(player1 player2));
-        let c2 = self.player2.strategy.call(rt, ctx!(player2 player1));
+        let c1 = self.player1.strategy.call(rt, view!(player1 player2));
+        let c2 = self.player2.strategy.call(rt, view!(player2 player1));
         let (g1, g2) = (self.matrix)(c1, c2);
 
         let player1 = self.player1.next(g1, c1);

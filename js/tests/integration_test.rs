@@ -5,7 +5,7 @@ use jailbird_js::*;
 fn always_cooperate() {
     let mut js = Js::new();
     let always_cooperate = js.bind("return COOPERATE;");
-    let choice = js.call(&always_cooperate, DummyCtx).unwrap();
+    let choice = js.call(&always_cooperate, DummyView).unwrap();
 
     assert_eq!(choice, Cooperate);
 }
@@ -13,15 +13,15 @@ fn always_cooperate() {
 #[test]
 fn tit_for_tat() {
     let mut js = Js::new();
-    let tit_for_tat = js.bind("return context.otherPlayer.choices.at(-1) ?? COOPERATE;");
+    let tit_for_tat = js.bind("return view.otherPlayer.choices.at(-1) ?? COOPERATE;");
 
-    let first_ctx = ChoicesContext::new(&[], &[]);
-    let first_choice = js.call(&tit_for_tat, first_ctx).unwrap();
+    let first_view = ChoicesView::new(&[], &[]);
+    let first_choice = js.call(&tit_for_tat, first_view).unwrap();
 
     assert_eq!(first_choice, Cooperate);
 
-    let later_ctx = ChoicesContext::new(&[], &[Defect]);
-    let later_choice = js.call(&tit_for_tat, later_ctx).unwrap();
+    let later_view = ChoicesView::new(&[], &[Defect]);
+    let later_choice = js.call(&tit_for_tat, later_view).unwrap();
 
     assert_eq!(later_choice, Defect);
 }
@@ -29,28 +29,28 @@ fn tit_for_tat() {
 #[test]
 fn grudger() {
     let mut js = Js::new();
-    let grudger = js.bind("return context.otherPlayer.everDefected ? DEFECT : COOPERATE;");
+    let grudger = js.bind("return view.otherPlayer.everDefected ? DEFECT : COOPERATE;");
 
-    let first_ctx = ChoicesContext::new(&[], &[]);
-    let first_choice = js.call(&grudger, first_ctx).unwrap();
+    let first_view = ChoicesView::new(&[], &[]);
+    let first_choice = js.call(&grudger, first_view).unwrap();
 
     assert_eq!(first_choice, Cooperate);
 
-    let later_ctx = ChoicesContext::new(&[], &[Cooperate]);
-    let later_choice = js.call(&grudger, later_ctx).unwrap();
+    let later_view = ChoicesView::new(&[], &[Cooperate]);
+    let later_choice = js.call(&grudger, later_view).unwrap();
 
     assert_eq!(later_choice, Cooperate);
 
-    let even_later_ctx = ChoicesContext::new(&[], &[Defect, Cooperate]);
-    let even_later_choice = js.call(&grudger, even_later_ctx).unwrap();
+    let even_later_view = ChoicesView::new(&[], &[Defect, Cooperate]);
+    let even_later_choice = js.call(&grudger, even_later_view).unwrap();
 
     assert_eq!(even_later_choice, Defect);
 }
 
 #[derive(Copy, Clone)]
-struct DummyCtx;
+struct DummyView;
 
-impl Context for DummyCtx {
+impl View for DummyView {
     type Turn = Self;
     type Player = Self;
 
@@ -67,7 +67,7 @@ impl Context for DummyCtx {
     }
 }
 
-impl Turn for DummyCtx {
+impl TurnView for DummyView {
     fn cur(&self) -> i32 {
         1
     }
@@ -77,7 +77,7 @@ impl Turn for DummyCtx {
     }
 }
 
-impl Player for DummyCtx {
+impl PlayerView for DummyView {
     fn score(&self) -> i32 {
         0
     }
@@ -87,20 +87,20 @@ impl Player for DummyCtx {
     }
 }
 
-struct ChoicesContext(ChoicesPlayerContext, ChoicesPlayerContext);
+struct ChoicesView(ChoicesPlayerView, ChoicesPlayerView);
 
-impl ChoicesContext {
+impl ChoicesView {
     fn new(this: &'static [Choice], other: &'static [Choice]) -> Self {
-        Self(ChoicesPlayerContext(this), ChoicesPlayerContext(other))
+        Self(ChoicesPlayerView(this), ChoicesPlayerView(other))
     }
 }
 
-impl Context for ChoicesContext {
-    type Turn = DummyCtx;
-    type Player = ChoicesPlayerContext;
+impl View for ChoicesView {
+    type Turn = DummyView;
+    type Player = ChoicesPlayerView;
 
     fn turn(&self) -> Self::Turn {
-        DummyCtx
+        DummyView
     }
 
     fn this_player(&self) -> Self::Player {
@@ -113,9 +113,9 @@ impl Context for ChoicesContext {
 }
 
 #[derive(Copy, Clone)]
-struct ChoicesPlayerContext(&'static [Choice]);
+struct ChoicesPlayerView(&'static [Choice]);
 
-impl Player for ChoicesPlayerContext {
+impl PlayerView for ChoicesPlayerView {
     fn score(&self) -> i32 {
         0
     }

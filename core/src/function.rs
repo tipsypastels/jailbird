@@ -1,8 +1,8 @@
-use crate::{Player, Runtime, Turn};
+use crate::{Runtime, View};
 use implicit_clone::{unsync::IString, ImplicitClone};
 use jailbird_choice::Choice;
 
-pub(crate) type NativeFunction = fn(Context) -> Choice;
+pub(crate) type NativeFunction = fn(View) -> Choice;
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 pub struct Function(pub(crate) FunctionInner);
@@ -22,14 +22,14 @@ pub(crate) enum FunctionInner {
 use FunctionInner as Fi;
 
 impl Function {
-    pub fn call(&self, rt: &mut Runtime, ctx: Context) -> Choice {
+    pub fn call(&self, rt: &mut Runtime, view: View) -> Choice {
         match &self.0 {
-            Fi::Native(func) => func(ctx),
+            Fi::Native(func) => func(view),
             #[cfg(feature = "js")]
-            Fi::NativeWithJsExample { func, .. } => func(ctx),
+            Fi::NativeWithJsExample { func, .. } => func(view),
             #[cfg(feature = "js")]
             // TODO: Don't unwrap.
-            Fi::Js(func) => rt.js.call(func, ctx).unwrap(),
+            Fi::Js(func) => rt.js.call(func, view).unwrap(),
         }
     }
 
@@ -40,31 +40,5 @@ impl Function {
             Fi::NativeWithJsExample { example, .. } => (*example).into(),
             Fi::Js(func) => func.body(),
         }
-    }
-}
-
-#[derive(Debug, Clone, ImplicitClone, PartialEq)]
-#[non_exhaustive]
-pub struct Context {
-    pub turn: Turn,
-    pub this_player: Player,
-    pub other_player: Player,
-}
-
-#[cfg(feature = "js")]
-impl jailbird_js::Context for Context {
-    type Turn = Turn;
-    type Player = Player;
-
-    fn turn(&self) -> Self::Turn {
-        self.turn.clone()
-    }
-
-    fn this_player(&self) -> Self::Player {
-        self.this_player.clone()
-    }
-
-    fn other_player(&self) -> Self::Player {
-        self.other_player.clone()
     }
 }

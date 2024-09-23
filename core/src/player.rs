@@ -50,7 +50,7 @@ impl From<Strategy> for Player {
 }
 
 #[cfg(feature = "js")]
-impl jailbird_js::Player for Player {
+impl jailbird_js::PlayerView for Player {
     fn score(&self) -> i32 {
         self.score as i32
     }

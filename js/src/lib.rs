@@ -4,12 +4,12 @@ use self::engine::Engine;
 use boa_engine::js_str;
 use std::fmt;
 
-mod context;
 mod engine;
 mod function;
+mod view;
 
-pub use context::{Context, Player, Turn};
 pub use function::{CallError, CallResult, Function};
+pub use view::{PlayerView, TurnView, View};
 
 pub struct Js {
     engine: Engine,
@@ -29,8 +29,8 @@ impl Js {
         Function::new(body, &mut self.engine)
     }
 
-    pub fn call<C: Context>(&mut self, function: &Function, ctx: C) -> CallResult {
-        self.engine.set_context(ctx);
+    pub fn call(&mut self, function: &Function, view: impl View) -> CallResult {
+        self.engine.set_view(view);
         function.call(&mut self.engine)
     }
 }

@@ -1,4 +1,4 @@
-use crate::{Context, Player, Turn};
+use crate::{PlayerView, TurnView, View};
 use boa_engine::{
     js_str,
     object::{
@@ -39,27 +39,27 @@ impl Engine {
         function.call(&JsValue::Undefined, &[], &mut self.boa)
     }
 
-    pub fn set_context(&mut self, ctx: impl Context) {
-        let key = js_str!("__context__");
-        let value = self.context(ctx);
+    pub fn set_view(&mut self, view: impl View) {
+        let key = js_str!("__view__");
+        let value = self.view(view);
 
         self.boa
             .global_object()
             .set(key, value, /* throw on err */ true, &mut self.boa)
-            .expect("failed to set context global");
+            .expect("failed to set view global");
     }
 
-    fn context(&mut self, ctx: impl Context) -> JsObject {
+    fn view(&mut self, view: impl View) -> JsObject {
         let boa = &mut self.boa;
         let attr = Attribute::empty();
 
-        let turn_ctx = ctx.turn();
+        let turn = view.turn();
         let turn_obj = ObjectInitializer::new(boa)
-            .property(js_str!("cur"), turn_ctx.cur(), attr)
-            .property(js_str!("max"), turn_ctx.max(), attr)
+            .property(js_str!("cur"), turn.cur(), attr)
+            .property(js_str!("max"), turn.max(), attr)
             .build();
 
-        fn _player_context(boa: &mut Boa, player: impl Player) -> JsObject {
+        fn player_view(boa: &mut Boa, player: impl PlayerView) -> JsObject {
             let attr = Attribute::empty();
             let elements = player
                 .choices()
@@ -67,7 +67,7 @@ impl Engine {
                 .map(|&c| JsValue::Boolean(c.is_cooperate()));
 
             let choices = JsArray::from_iter(elements, boa);
-            
+
             let score = player.score();
             let ever_c = player.ever_cooperated();
             let ever_d = player.ever_defected();
@@ -80,10 +80,8 @@ impl Engine {
                 .build()
         }
 
-        let mut player_context = |p| _player_context(boa, p);
-
-        let this_player_obj = player_context(ctx.this_player());
-        let other_player_obj = player_context(ctx.other_player());
+        let this_player_obj = player_view(boa, view.this_player());
+        let other_player_obj = player_view(boa, view.other_player());
 
         ObjectInitializer::new(boa)
             .property(js_str!("turn"), turn_obj, attr)

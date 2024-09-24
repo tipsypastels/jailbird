@@ -12,7 +12,7 @@ pub use jailbird_choice::*;
 pub use player::{Choices, Player};
 pub use strategy::{Strategy, StrategyBuilder};
 pub use turn::Turn;
-pub use versus::{Versus, VersusEnding, VersusState, VersusWinnerOrLoser};
+pub use versus::{Versus, VersusEnding, VersusPlayer, VersusState};
 pub use view::View;
 
 #[derive(Debug)]

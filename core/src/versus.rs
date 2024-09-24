@@ -7,8 +7,8 @@ use jailbird_choice::{Choice, ChoiceMatrix};
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 #[non_exhaustive]
 pub struct Versus {
-    pub player1: Player,
-    pub player2: Player,
+    pub player1: VersusPlayer,
+    pub player2: VersusPlayer,
     pub turn: Turn,
     matrix: ChoiceMatrix,
 }
@@ -20,8 +20,8 @@ impl Versus {
         turn: impl Into<Turn>,
     ) -> Self {
         Self {
-            player1: player1.into(),
-            player2: player2.into(),
+            player1: VersusPlayer::new(player1.into()),
+            player2: VersusPlayer::new(player2.into()),
             turn: turn.into(),
             matrix: Choice::matrix,
         }
@@ -42,13 +42,13 @@ impl Versus {
 
             macro_rules! win_lose {
                 ($p1_won:literal) => {
-                    VersusEnding::WinLose {
-                        player1: VersusWinnerOrLoser {
-                            player: player1,
+                    VersusEnding {
+                        player1: VersusPlayer {
+                            player: player1.player,
                             won: $p1_won,
                         },
-                        player2: VersusWinnerOrLoser {
-                            player: player2,
+                        player2: VersusPlayer {
+                            player: player2.player,
                             won: !$p1_won,
                         },
                     }
@@ -58,7 +58,7 @@ impl Versus {
             return match () {
                 () if player1.score > player2.score => VersusState::Ending(win_lose!(true)),
                 () if player2.score > player1.score => VersusState::Ending(win_lose!(false)),
-                () => VersusState::Ending(VersusEnding::Tie { player1, player2 }),
+                () => VersusState::Ending(VersusEnding { player1, player2 }),
             };
         };
 
@@ -66,8 +66,8 @@ impl Versus {
             ($this:ident $other:ident) => {
                 View {
                     turn: turn.clone(),
-                    this_player: self.$this.clone(),
-                    other_player: self.$other.clone(),
+                    this_player: self.$this.clone().player,
+                    other_player: self.$other.clone().player,
                 }
             };
         }
@@ -102,41 +102,39 @@ pub enum VersusState {
 }
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
-pub enum VersusEnding {
-    WinLose {
-        player1: VersusWinnerOrLoser,
-        player2: VersusWinnerOrLoser,
-    },
-    Tie {
-        player1: Player,
-        player2: Player,
-    },
+#[non_exhaustive]
+pub struct VersusEnding {
+    pub player1: VersusPlayer,
+    pub player2: VersusPlayer,
 }
 
 impl VersusEnding {
-    pub fn into_win_lose(self) -> Result<(VersusWinnerOrLoser, VersusWinnerOrLoser), Self> {
-        match self {
-            Self::WinLose { player1, player2 } => Ok((player1, player2)),
-            other => Err(other),
-        }
-    }
-
-    pub fn into_tie(self) -> Result<(Player, Player), Self> {
-        match self {
-            Self::Tie { player1, player2 } => Ok((player1, player2)),
-            other => Err(other),
-        }
+    pub fn is_tie(&self) -> bool {
+        !self.player1.won && !self.player2.won
     }
 }
 
 #[derive(Debug, Clone, ImplicitClone, PartialEq)]
 #[non_exhaustive]
-pub struct VersusWinnerOrLoser {
+pub struct VersusPlayer {
     pub player: Player,
     pub won: bool,
 }
 
-impl Deref for VersusWinnerOrLoser {
+impl VersusPlayer {
+    fn new(player: Player) -> Self {
+        Self { player, won: false }
+    }
+
+    fn next(self, gain: u32, choice: Choice) -> Self {
+        Self {
+            player: self.player.next(gain, choice),
+            won: false,
+        }
+    }
+}
+
+impl Deref for VersusPlayer {
     type Target = Player;
 
     fn deref(&self) -> &Self::Target {

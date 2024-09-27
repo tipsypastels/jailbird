@@ -1015,6 +1015,7 @@ name = "jailbird-app"
 version = "0.1.0"
 dependencies = [
  "implicit-clone 0.5.0",
+ "jailbird",
  "wasm-bindgen",
  "yew",
  "yew-router",

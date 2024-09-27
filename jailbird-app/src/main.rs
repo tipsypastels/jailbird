@@ -1,9 +1,16 @@
+use self::runtime::{Runtime, RuntimeContextProvider};
 use yew::prelude::*;
+
+mod runtime;
 
 #[function_component]
 fn App() -> Html {
+    let runtime = use_mut_ref(Runtime::new);
+
     html! {
-        <h1>{"Hello, world!"}</h1>
+        <RuntimeContextProvider context={runtime}>
+            <h1>{"Hello, world!"}</h1>
+        </RuntimeContextProvider>
     }
 }
 

@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 boa_engine = "0.19.1"
 implicit-clone.workspace = true
-jailbird-choice = { path = "../choice" }
+jailbird-choice = { path = "../jailbird-choice" }

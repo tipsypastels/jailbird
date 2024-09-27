@@ -1,4 +1,4 @@
-use jailbird_core::*;
+use jailbird::*;
 
 #[test]
 fn simple() {

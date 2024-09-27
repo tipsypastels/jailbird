@@ -1,5 +1,5 @@
 [package]
-name = "jailbird-core"
+name = "jailbird"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,6 +8,6 @@ default = ["js"]
 js = ["dep:jailbird-js"]
 
 [dependencies]
-jailbird-choice = { path = "../choice" }
-jailbird-js = { path = "../js", optional = true }
+jailbird-choice = { path = "../jailbird-choice" }
+jailbird-js = { path = "../jailbird-js", optional = true }
 implicit-clone.workspace = true
